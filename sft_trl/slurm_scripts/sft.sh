@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=sft_poro
+#SBATCH --job-name=sft_poro_test
 #SBATCH --account=project_462000558
 #SBATCH --partition=dev-g
 #SBATCH --cpus-per-task=56
@@ -9,13 +9,13 @@
 #SBATCH --mem=480G
 #SBATCH --exclusive
 #SBATCH -t 01:00:00
-#SBATCH -o logs/%x-%j.out
-#SBATCH -e logs/%x-%j.err
+#SBATCH -o slurm_out/%x-%j.out
+#SBATCH -e slurm_out/%x-%j.err
 
-mkdir -p logs
-rm -f logs/latest.out logs/latest.err
-ln -s $SLURM_JOB_NAME-$SLURM_JOB_ID.out logs/latest.out
-ln -s $SLURM_JOB_NAME-$SLURM_JOB_ID.err logs/latest.err
+mkdir -p slurm_out
+rm -f slurm_out/latest.out slurm_out/latest.err
+ln -s $SLURM_JOB_NAME-$SLURM_JOB_ID.out slurm_out/latest.out
+ln -s $SLURM_JOB_NAME-$SLURM_JOB_ID.err slurm_out/latest.err
 
 # auto-fail on any errors in this script
 set -eo pipefail
@@ -25,13 +25,13 @@ set -x
 
 echo "PWD" $PWD
 
-module use /appl/local/csc/modulefiles/ #It is adviced to add this into your .bashrc/.profile
+module use /appl/local/csc/modulefiles/ # It is advised to add this into your .bashrc/.profile
 module load pytorch
 
 
-export HF_HOME=/scratch/project_462000558/cache
+export HF_HOME=/scratch/project_462000558/hf_cache
 
-#Variables for distributed enviroment
+#Variables for distributed environment
 export MASTER_PORT=$(expr 10000 + $(echo -n $SLURM_JOBID | tail -c 4))
 master_addr=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
 export MASTER_ADDR=$master_addr
@@ -39,7 +39,7 @@ export LOCAL_RANK=$SLURM_LOCALID
 export WORLD_SIZE=$((SLURM_GPUS_ON_NODE*SLURM_NNODES))
 
 #LOGGING/DEBUGGING
-#export TORCH_DISTRIBUTED_DEBUG=DETAIL #Detailed stack trackes from worker failures
+#export TORCH_DISTRIBUTED_DEBUG=DETAIL #Detailed stack traces from worker failures
 #export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
 #export NCCL_DEBUG=INFO
 #export HIP_LAUNCH_BLOCKING=1

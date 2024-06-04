@@ -1,10 +1,11 @@
 from transformers import PreTrainedTokenizer, AutoTokenizer
 from configs import ModelArguments, DataArguments
 from data import DEFAULT_CHAT_TEMPLATE
-from peft import PeftConfig,LoraConfig
+from peft import PeftConfig, LoraConfig
+
 
 def get_tokenizer(
-    model_args: ModelArguments, data_args: DataArguments, auto_set_chat_template: bool = True
+        model_args: ModelArguments, data_args: DataArguments, auto_set_chat_template: bool = True
 ) -> PreTrainedTokenizer:
     """Get the tokenizer for the model."""
     tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path)
